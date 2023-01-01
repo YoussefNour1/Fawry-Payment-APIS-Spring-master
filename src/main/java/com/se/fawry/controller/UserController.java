@@ -8,7 +8,6 @@ import com.se.fawry.enums.TransactionType;
 import com.se.fawry.model.repository.UserRepository;
 import com.se.fawry.service.Service;
 import com.se.fawry.service.UserService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -89,10 +88,9 @@ public class UserController {
         return ResponseEntity.ok(transaction);
     }
 
-    record RequestRefund(long userId, long transactionId){}
-    @PostMapping("/user/request-refund")
-    public ResponseEntity<RefundRequest> refund(@RequestBody RequestRefund refundRequest) {
-        RefundRequest createdRefundRequest = userService.requestRefund(refundRequest.transactionId, refundRequest.userId);
+    @PostMapping("/user/request/refund")
+    public ResponseEntity<RefundRequest> refund(@RequestBody RefundRequest refundRequest) {
+        RefundRequest createdRefundRequest = userService.requestRefund(refundRequest.getTransaction().getId(), refundRequest.getUser());
         if (createdRefundRequest == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -101,15 +99,11 @@ public class UserController {
 
 
     @GetMapping("/user/discounts")
-    public List<Discount> getDiscounts() {
-        return userService.getOverAllDiscounts();
-    }
-    @GetMapping("/user/{userId}/{serviceId}/discounts")
-    public List<Discount> getDiscounts(@PathVariable long serviceId, @PathVariable long userId) {
-        return userService.getDiscounts(serviceId, userId);
+    public List<Discount> getDiscounts(@RequestParam long serviceId, @RequestParam User user) {
+        return userService.getDiscounts(serviceId, user);
     }
 
-   /* record AddService(String name, boolean cashOnDelivery, boolean creditCardPayment, String provider, ServiceType serviceType){}
+    record AddService(String name, boolean cashOnDelivery, boolean creditCardPayment, String provider, ServiceType serviceType){}
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/add/service")
     public ResponseEntity<Service> addService(@RequestBody AddService service){
@@ -119,6 +113,5 @@ public class UserController {
     @GetMapping("/users")
     public List<User> all(){
         return userService.getAll();
-    }*/
-
+    }
 }
