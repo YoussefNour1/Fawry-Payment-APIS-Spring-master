@@ -52,7 +52,8 @@ public class UserService {
     public List<User> getAll() {
         return userRepository.findAll();
     }
-    public User getById(Long id){
+
+    public User getById(Long id) {
         return userRepository.findById(id).get();
     }
 
@@ -128,13 +129,8 @@ public class UserService {
     }
 
     public List<Service> search(String query) {
-        if (globalUser.getRole() == Role.ADMIN) {
-            // admin users can search for all services
-            return serviceRepository.findByNameContainingIgnoreCase(query);
-        } else {
-            // normal users can only search for available services
-            return serviceRepository.findByNameContainingIgnoreCaseAndIsAvailableIsTrue(query);
-        }
+        // normal users can only search for available services
+        return serviceRepository.findByNameContainingIgnoreCaseAndIsAvailableIsTrue(query);
     }
 
 
@@ -153,7 +149,7 @@ public class UserService {
         }
 
         // apply discounts
-        List<Discount> discounts = getDiscounts(serviceId, user);
+        List<Discount> discounts = getDiscounts(serviceId, (long) user.getId());
         for (Discount discount : discounts) {
             totalAmount *= (1 - discount.getPercentage());
         }
@@ -166,12 +162,11 @@ public class UserService {
                 List<CreditCard> userCards = creditCardRepository.findAllByUser(user);
                 for (CreditCard card : userCards) {
                     if (card.getCardNumber().equals(cardNumber)) {
-                        if( card.getBalance() - totalAmount >= 0){
+                        if (card.getBalance() - totalAmount >= 0) {
                             card.setBalance(card.getBalance() - totalAmount);
                             creditCardRepository.save(card);
                             System.out.println("inside if");
-                        }
-                        else throw new RuntimeException("Can't complete this payment");
+                        } else throw new RuntimeException("Can't complete this payment");
                     }
                 }
 
@@ -200,8 +195,9 @@ public class UserService {
 
 
     //5.requestRefund
-    public RefundRequest requestRefund(long transactionId, User user) {
+    public RefundRequest requestRefund(long transactionId, long userId) {
         // check if the transaction exists and belongs to the user
+        User user = userRepository.findById(userId).get();
         Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
         if (transaction == null || !(transaction.getUser().getId() == user.getId())) {
             throw new RuntimeException("Transaction not found or not belonging to the user");
@@ -225,9 +221,10 @@ public class UserService {
 
 
     //7.getDiscounts
-    public List<Discount> getDiscounts(long serviceId, User user) {
+    public List<Discount> getDiscounts(long serviceId, Long user_id) {
 
         // get overall discounts
+        User user = userRepository.findById(user_id).get();
         List<Discount> discounts = new ArrayList<>(discountRepository.findByType(DiscountType.OVERALL));
 
         // get specific discounts for the service
@@ -246,6 +243,10 @@ public class UserService {
             }
         }
         return discounts;
+    }
+
+    public List<Discount> getOverAllDiscounts() {
+        return discountRepository.findAll();
     }
 
     public List<Service> getServices() {

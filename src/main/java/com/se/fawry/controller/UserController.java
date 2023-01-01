@@ -103,7 +103,13 @@ public class UserController {
         return userService.getDiscounts(serviceId, user);
     }
 
-
+    record AddService(String name, boolean cashOnDelivery, boolean creditCardPayment, String provider, ServiceType serviceType){}
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/add/service")
+    public ResponseEntity<Service> addService(@RequestBody AddService service){
+        Service service1 = userService.addService(service.name, service.cashOnDelivery, service.creditCardPayment, service.provider, service.serviceType);
+        return ResponseEntity.ok(service1);
+    }
     @GetMapping("/users")
     public List<User> all(){
         return userService.getAll();
