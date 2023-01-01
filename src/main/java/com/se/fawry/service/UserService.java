@@ -49,16 +49,11 @@ public class UserService {
     }
 
 
-    private void initializeSomeData() {
-        userRepository.save(new User("youssef", "youssef@mail.com", "1234", 100, Role.USER));
-        userRepository.save(new User("y", "y@mail.com", "1234", 0, Role.ADMIN));
-        userRepository.save(new User("s", "s@mail.com", "1234", 250, Role.USER));
-        userRepository.save(new User("Mo", "mo@mail.com", "1234", 0, Role.USER));
-
-    }
-
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+    public User getById(Long id){
+        return userRepository.findById(id).get();
     }
 
     public User signIn(String email, String password) {
@@ -168,13 +163,16 @@ public class UserService {
             // process the payment via credit card or wallet
             if (paymentMethod == PaymentMethod.CREDIT_CARD) {
                 // process the payment via credit card
-                // ...
                 List<CreditCard> userCards = creditCardRepository.findAllByUser(user);
                 for (CreditCard card : userCards) {
-                    if (card.getCardNumber().equals(cardNumber) && (card.getBalance() - totalAmount >= 0)) {
-                        card.setBalance(card.getBalance() - totalAmount);
-                        creditCardRepository.save(card);
-                    } else throw new RuntimeException("Can't complete this payment");
+                    if (card.getCardNumber().equals(cardNumber)) {
+                        if( card.getBalance() - totalAmount >= 0){
+                            card.setBalance(card.getBalance() - totalAmount);
+                            creditCardRepository.save(card);
+                            System.out.println("inside if");
+                        }
+                        else throw new RuntimeException("Can't complete this payment");
+                    }
                 }
 
             } else if (paymentMethod == PaymentMethod.WALLET) {

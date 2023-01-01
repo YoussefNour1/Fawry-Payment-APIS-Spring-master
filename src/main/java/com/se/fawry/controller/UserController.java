@@ -5,6 +5,7 @@ import com.se.fawry.enums.PaymentMethod;
 import com.se.fawry.enums.Role;
 import com.se.fawry.enums.ServiceType;
 import com.se.fawry.enums.TransactionType;
+import com.se.fawry.model.repository.UserRepository;
 import com.se.fawry.service.Service;
 import com.se.fawry.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class UserController {
     public UserService getUserService() {
         return userService;
     }
+
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -65,17 +67,18 @@ public class UserController {
     }
 
 
-    record PayRequest(Long serviceId, User user, boolean cashOnDelivery, boolean payWithCreditCard, String cardNumber, double amount){}
+    record PayRequest(Long serviceId, Long user_id, boolean cashOnDelivery, boolean payWithCreditCard, String cardNumber, double amount){}
     @PostMapping("/user/pay")
     public ResponseEntity<Transaction> pay(@RequestBody PayRequest payRequest) {
         Transaction transaction;
+        User user = userService.getById(payRequest.user_id);
         if (payRequest.payWithCreditCard && !payRequest.cashOnDelivery){
-            transaction = userService.pay(payRequest.serviceId, payRequest.user, PaymentMethod.CREDIT_CARD, payRequest.amount ,false, payRequest.cardNumber);
+            transaction = userService.pay(payRequest.serviceId, user, PaymentMethod.CREDIT_CARD, payRequest.amount ,false, payRequest.cardNumber);
         } else if (!payRequest.payWithCreditCard && !payRequest.cashOnDelivery) {
-            transaction = userService.pay(payRequest.serviceId, payRequest.user, PaymentMethod.WALLET, payRequest.amount ,false, payRequest.cardNumber);
+            transaction = userService.pay(payRequest.serviceId, user, PaymentMethod.WALLET, payRequest.amount ,false, payRequest.cardNumber);
         }
         else {
-            transaction = userService.pay(payRequest.serviceId, payRequest.user, PaymentMethod.CASH_ON_DELIVERY, payRequest.amount , true, payRequest.cardNumber);
+            transaction = userService.pay(payRequest.serviceId, user, PaymentMethod.CASH_ON_DELIVERY, payRequest.amount , true, payRequest.cardNumber);
         }
 
         if (transaction == null) {
