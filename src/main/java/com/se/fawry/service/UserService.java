@@ -252,49 +252,11 @@ public class UserService {
         return new ArrayList<>(serviceRepository.findAll());
     }
 
-    // 1. Admin add service
-    public Service addService(String name, boolean cacheOnDelivery, boolean creditCardPayment, String provider, ServiceType type) {
-        Service service = new Service();
-        service.setName(name);
-        service.setCacheOnDelivery(cacheOnDelivery);
-        service.setCreditCardPayment(creditCardPayment);
-        service.setAvailable(true);
-        service.setProvider(provider);
-        service.setType(type);
-        return serviceRepository.save(service);
-    }
 
-    // 2. Admin add overall Discount
-    public void addOverallDiscount(String name, double percentage) {
-        if (globalUser.getRole() == Role.ADMIN) {
-            Discount discount = new Discount();
-            discount.setName(name);
-            discount.setPercentage(percentage);
-            discountRepository.save(discount);
-        }
-    }
 
-    // 3. Admin add specific Discount
-    public void addSpecificDiscount(String name, double percentage, long serviceId) {
-        if (globalUser.getRole() == Role.ADMIN) {
-            Service service = serviceRepository.findById(serviceId).orElseThrow(() ->
-                    new ResourceNotFoundException("Service not found"));
-            Discount discount = new Discount();
-            discount.setName(name);
-            discount.setPercentage(percentage);
-            discount.setService(service);
-            discountRepository.save(discount);
-        }
-    }
 
-    // 4. Admin list all transactions
-    public List<Transaction> listTransactions() {
-        if (globalUser.getRole() == Role.ADMIN) {
-            return transactionRepository.findAll();
-        } else {
-            throw new RuntimeException("You aren't authorized");
-        }
-    }
+
+
 
     // 5. Admin List all refund request
     public List<RefundRequest> listRefundRequests() {
