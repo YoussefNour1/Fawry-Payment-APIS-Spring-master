@@ -1,0 +1,13 @@
+#spring:
+#  application:
+#    name: Fawry APIs
+#  datasource:
+#    driverClassName: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://localhost:3306/fawrydb
+#    username: root
+#    password:
+#
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
