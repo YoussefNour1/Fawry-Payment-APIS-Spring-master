@@ -1,5 +1,6 @@
 package com.se.fawry.controller;
 import com.se.fawry.enums.ServiceType;
+import com.se.fawry.enums.TransactionType;
 import com.se.fawry.model.entity.Discount;
 import com.se.fawry.model.entity.RefundRequest;
 import com.se.fawry.model.entity.Transaction;

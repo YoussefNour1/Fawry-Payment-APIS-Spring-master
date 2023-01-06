@@ -4,5 +4,6 @@ public enum ServiceType {
     MOBILE_RECHARGE,
     INTERNET_PAYMENT,
     LANDLINE,
-    DONATION
+    DONATION,
+    OVERALL
 }

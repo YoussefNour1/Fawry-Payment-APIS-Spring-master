@@ -1,6 +1,5 @@
 package com.se.fawry.service;
 
-import com.se.fawry.enums.Role;
 import com.se.fawry.enums.ServiceType;
 import com.se.fawry.enums.TransactionType;
 import com.se.fawry.model.entity.*;
@@ -9,11 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @org.springframework.stereotype.Service
 public class AdminServices {
@@ -80,8 +76,16 @@ public class AdminServices {
 
     // 4 . List Transactions
     public List<Transaction> listTransactions() {
-        List<Transaction> transactions = new ArrayList<>(transactionRepository.findAll());
+        List<Transaction> paymentTransactions = transactionRepository.findByType(TransactionType.PAYMENT);
+        List<Transaction> RefundTransactions = transactionRepository.findByType(TransactionType.REFUND);
+        List<Transaction> AddToWalletTransactions = transactionRepository.findByType(TransactionType.ADD_TO_WALLET);
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        transactions.add((Transaction) paymentTransactions);
+        transactions.add((Transaction) RefundTransactions);
+        transactions.add((Transaction) AddToWalletTransactions);
+
         return transactions;
+
     }
 
     public  List<RefundRequest> refundRequestList(){
